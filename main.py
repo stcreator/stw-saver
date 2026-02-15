@@ -20,6 +20,39 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, HttpUrl
 import uvicorn
 
+# ======================
+# FIX FOR RENDER READ-ONLY FILESYSTEM
+# ======================
+
+# Check if we're on Render
+ON_RENDER = os.environ.get('RENDER', False) or os.path.exists('/etc/render')
+
+# Use /tmp for all file operations on Render
+if ON_RENDER:
+    BASE_DIR = '/tmp/stwsaver'
+    os.makedirs(BASE_DIR, exist_ok=True)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Set directories - use environment variables or defaults
+DOWNLOADS_DIR = os.getenv('DOWNLOADS_DIR', os.path.join(BASE_DIR, "downloads"))
+TEMP_DIR = os.getenv('TEMP_DIR', os.path.join(BASE_DIR, "temp"))
+
+# Create directories
+os.makedirs(DOWNLOADS_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
+
+# Print debug info
+print(f"ON_RENDER: {ON_RENDER}")
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"DOWNLOADS_DIR: {DOWNLOADS_DIR}")
+print(f"TEMP_DIR: {TEMP_DIR}")
+print(f"Write test: {os.access(DOWNLOADS_DIR, os.W_OK)}")
+
+# ======================
+# REST OF YOUR IMPORTS AND CODE...
+# ======================
+
 # For video downloading
 try:
     import yt_dlp
