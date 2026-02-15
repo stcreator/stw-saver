@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: stwsaver-backend
+    runtime: python
+    plan: free
+    buildCommand: |
+      apt-get update
+      apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: MAX_FILE_AGE
+        value: 300
+      - key: CLEANUP_INTERVAL
+        value: 300
